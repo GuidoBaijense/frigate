@@ -132,3 +132,4 @@ class User(Model):  # type: ignore[misc]
     )
     password_hash = CharField(null=False, max_length=120)
     notification_tokens = JSONField()
+    mail = CharField(null=True, max_length=120)  # Optional email for OIDC

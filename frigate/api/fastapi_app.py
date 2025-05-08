@@ -20,6 +20,7 @@ from frigate.api import (
     notification,
     preview,
     review,
+    oidc,
 )
 from frigate.api.auth import get_jwt_secret, limiter
 from frigate.comms.event_metadata_updater import (
@@ -110,6 +111,8 @@ def create_fastapi_app(
     # Routes
     # Order of include_router matters: https://fastapi.tiangolo.com/tutorial/path-params/#order-matters
     app.include_router(auth.router)
+    if frigate_config.auth.oidc.enabled:
+        app.include_router(oidc.router)
     app.include_router(classification.router)
     app.include_router(review.router)
     app.include_router(main_app.router)

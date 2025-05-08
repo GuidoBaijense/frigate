@@ -34,3 +34,14 @@ class AuthConfig(FrigateBaseModel):
     )
     # As of Feb 2023, OWASP recommends 600000 iterations for PBKDF2-SHA256
     hash_iterations: int = Field(default=600000, title="Password hash iterations")
+
+    class OIDCConfig(FrigateBaseModel):
+        enabled: bool = Field(default=False, title="Enable OIDC authentication")
+        client_id: Optional[str] = Field(default=None, title="OIDC Client ID")
+        client_secret: Optional[str] = Field(default=None, title="OIDC Client Secret")
+        issuer: Optional[str] = Field(default=None, title="OIDC Issuer URL")
+        redirect_uri: Optional[str] = Field(default=None, title="OIDC Redirect URI")
+        scope: str = Field(default="openid email profile", title="OIDC Scopes")
+        extra_params: Optional[dict] = Field(default=None, title="Extra OIDC Params")
+
+    oidc: OIDCConfig = Field(default_factory=OIDCConfig, title="OIDC configuration")
