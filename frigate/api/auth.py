@@ -501,3 +501,43 @@ async def update_role(
 
     User.set_by_id(username, {User.role: body.role})
     return JSONResponse(content={"success": True})
+
+
+@router.post("/users/{username}/passkey", dependencies=[Depends(require_role(["admin"]))])
+def create_passkey(request: Request, username: str):
+    """Generate a passkey for a user."""
+    try:
+        # Ensure the user exists
+        user = User.get_by_id(username)
+    except DoesNotExist:
+        return JSONResponse(content={"message": "User not found"}, status_code=404)
+
+    # Generate a secure passkey
+    passkey = secrets.token_urlsafe(32)
+
+    # Store the passkey securely (e.g., hashed)
+    passkey_hash = hash_password(passkey)
+    User.set_by_id(username, {"passkey_hash": passkey_hash})
+
+    return JSONResponse(content={"username": username, "passkey": passkey})
+
+
+@router.post("/users/{username}/validate-passkey")
+def validate_passkey(request: Request, username: str, body: dict):
+    """Validate a user's passkey."""
+    passkey = body.get("passkey")
+    if not passkey:
+        return JSONResponse(content={"message": "Passkey is required"}, status_code=400)
+
+    try:
+        # Retrieve the user's stored passkey hash
+        user = User.get_by_id(username)
+        passkey_hash = user.passkey_hash
+    except DoesNotExist:
+        return JSONResponse(content={"message": "User not found"}, status_code=404)
+
+    # Verify the provided passkey
+    if verify_password(passkey, passkey_hash):
+        return JSONResponse(content={"message": "Passkey is valid"})
+    else:
+        return JSONResponse(content={"message": "Invalid passkey"}, status_code=401)

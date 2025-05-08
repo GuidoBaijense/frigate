@@ -1,4 +1,5 @@
 import logging
+import secrets
 from typing import Optional
 
 from fastapi import FastAPI, Request
@@ -7,6 +8,7 @@ from playhouse.sqliteq import SqliteQueueDatabase
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from starlette_context import middleware, plugins
 from starlette_context.plugins import Plugin
 
@@ -22,6 +24,7 @@ from frigate.api import (
     review,
 )
 from frigate.api.auth import get_jwt_secret, limiter
+from frigate.api.webauthn import router as webauthn_router
 from frigate.comms.event_metadata_updater import (
     EventMetadataPublisher,
 )
@@ -107,6 +110,10 @@ def create_fastapi_app(
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
     app.add_middleware(SlowAPIMiddleware)
 
+    # Add SessionMiddleware for WebAuthn functionality
+    # Generate a random secret key for session encryption
+    app.add_middleware(SessionMiddleware, secret_key=secrets.token_urlsafe(32))
+
     # Routes
     # Order of include_router matters: https://fastapi.tiangolo.com/tutorial/path-params/#order-matters
     app.include_router(auth.router)
@@ -118,6 +125,9 @@ def create_fastapi_app(
     app.include_router(export.router)
     app.include_router(event.router)
     app.include_router(media.router)
+    app.include_router(
+        webauthn_router
+    )  # Removed the prefix="/api" to avoid double prefixing
     # App Properties
     app.frigate_config = frigate_config
     app.embeddings = embeddings

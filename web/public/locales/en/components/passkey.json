@@ -1,0 +1,25 @@
+{
+    "title": "Passkeys Management",
+    "description": "Register and manage passkeys for passwordless login to your Frigate account.",
+    "register": "Register New Passkey",
+    "removeAll": "Remove All Passkeys",
+    "noPasskeys": "No passkeys registered yet. Register a new passkey to enable passwordless login.",
+    "deviceName": "Device ({{id}})",
+    "registeredOn": "Registered on",
+    "unknown": "Unknown date",
+    "success": {
+        "registered": "Passkey registered successfully",
+        "deleted": "All passkeys removed successfully"
+    },
+    "errors": {
+        "fetchFailed": "Failed to fetch passkeys",
+        "registrationFailed": "Failed to register passkey",
+        "deleteFailed": "Failed to delete passkeys",
+        "notAllowed": "Registration was rejected by the user or device",
+        "notSupported": "WebAuthn is not supported by this browser or device"
+    },
+    "confirmDelete": {
+        "title": "Remove All Passkeys",
+        "description": "This will remove all passkeys associated with your account. You will only be able to login with your password until you register new passkeys."
+    }
+}

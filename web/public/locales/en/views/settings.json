@@ -413,18 +413,29 @@
     },
     "addUser": "Add User",
     "updatePassword": "Update Password",
+    "tabs": {
+      "users": "User Accounts",
+      "passkeys": "Passkeys"
+    },
+    "passkeys": {
+      "notLoggedIn": "You need to be logged in to manage passkeys",
+      "title": "Passkey Management",
+      "description": "Register and manage passkeys for passwordless login"
+    },
     "toast": {
       "success": {
         "createUser": "User {{user}} created successfully",
         "deleteUser": "User {{user}} deleted successfully",
         "updatePassword": "Password updated successfully.",
-        "roleUpdated": "Role updated for {{user}}"
+        "roleUpdated": "Role updated for {{user}}",
+        "updatePasskey": "Passkey updated successfully"
       },
       "error": {
         "setPasswordFailed": "Failed to save password: {{errorMessage}}",
         "createUserFailed": "Failed to create user: {{errorMessage}}",
         "deleteUserFailed": "Failed to delete user: {{errorMessage}}",
-        "roleUpdateFailed": "Failed to update role: {{errorMessage}}"
+        "roleUpdateFailed": "Failed to update role: {{errorMessage}}",
+        "setPasskeyFailed": "Failed to save passkey: {{errorMessage}}"
       }
     },
     "table": {
@@ -434,7 +445,8 @@
       "noUsers": "No users found.",
       "changeRole": "Change user role",
       "password": "Password",
-      "deleteUser": "Delete user"
+      "deleteUser": "Delete user",
+      "passkey": "Passkey"
     },
     "dialog": {
       "form": {

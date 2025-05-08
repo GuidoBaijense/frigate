@@ -36,6 +36,11 @@ numpy == 1.26.*
 opencv-python-headless == 4.11.0.*
 opencv-contrib-python == 4.11.0.*
 scipy == 1.14.*
+# WebAuthn
+itsdangerous == 2.1.*
+cbor2 == 5.6.*
+cryptography == 42.0.*
+webauthn == 2.0.*
 # OpenVino & ONNX
 openvino == 2024.4.*
 onnxruntime-openvino == 1.20.* ; platform_machine == 'x86_64'

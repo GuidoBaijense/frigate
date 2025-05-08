@@ -13,8 +13,10 @@ import { toast } from "sonner";
 import DeleteUserDialog from "@/components/overlay/DeleteUserDialog";
 import { HiTrash } from "react-icons/hi";
 import { FaUserEdit } from "react-icons/fa";
+import ManagePasskeysDialog from "@/components/overlay/ManagePasskeysDialog";
+import PasskeyManager from "@/components/passkey/PasskeyManager";
 
-import { LuPlus, LuShield, LuUserCog } from "react-icons/lu";
+import { LuPlus, LuShield, LuUserCog, LuKey } from "react-icons/lu";
 import {
   Table,
   TableBody,
@@ -32,21 +34,26 @@ import {
 } from "@/components/ui/tooltip";
 import RoleChangeDialog from "@/components/overlay/RoleChangeDialog";
 import { useTranslation } from "react-i18next";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AuthenticationView() {
   const { t } = useTranslation("views/settings");
   const { data: config } = useSWR<FrigateConfig>("config");
   const { data: users, mutate: mutateUsers } = useSWR<User[]>("users");
+  const { data: profile } = useSWR("/profile");
 
   const [showSetPassword, setShowSetPassword] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [showRoleChange, setShowRoleChange] = useState(false);
+  const [showSetPasskey, setShowSetPasskey] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState<string>();
   const [selectedUserRole, setSelectedUserRole] = useState<
     "admin" | "viewer"
   >();
+
+  const [activeTab, setActiveTab] = useState("users");
 
   useEffect(() => {
     document.title = t("documentTitle.authentication");
@@ -205,25 +212,38 @@ export default function AuthenticationView() {
               {t("users.management.desc")}
             </p>
           </div>
-          <Button
-            className="flex items-center gap-2 self-start sm:self-auto"
-            aria-label={t("users.addUser")}
-            variant="default"
-            onClick={() => setShowCreate(true)}
-          >
-            <LuPlus className="size-4" />
-            {t("users.addUser")}
-          </Button>
         </div>
-        <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="scrollbar-container flex-1 overflow-hidden rounded-lg border border-border bg-background_alt">
-            <div className="h-full overflow-auto">
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-4">
+            <TabsTrigger value="users">
+              <LuUserCog className="mr-2" />
+              {t("users.tabs.users")}
+            </TabsTrigger>
+            {profile && profile.username && profile.username !== "anonymous" && (
+              <TabsTrigger value="passkeys">
+                <LuKey className="mr-2" />
+                {t("users.tabs.passkeys")}
+              </TabsTrigger>
+            )}
+          </TabsList>
+
+          <TabsContent value="users">
+            <div className="mb-4 flex items-center justify-between">
+              <Button
+                variant="default"
+                className="ml-auto"
+                onClick={() => setShowCreate(true)}
+              >
+                <LuPlus className="mr-2 h-4 w-4" />
+                {t("users.addUser")}
+              </Button>
+            </div>
+            <div className="rounded-md border">
               <Table>
-                <TableHeader className="sticky top-0 bg-muted/50">
+                <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[250px]">
-                      {t("users.table.username")}
-                    </TableHead>
+                    <TableHead>{t("users.table.username")}</TableHead>
                     <TableHead>{t("users.table.role")}</TableHead>
                     <TableHead className="text-right">
                       {t("users.table.actions")}
@@ -319,6 +339,28 @@ export default function AuthenticationView() {
                                 </TooltipContent>
                               </Tooltip>
 
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-8 px-2"
+                                    onClick={() => {
+                                      setShowSetPasskey(true);
+                                      setSelectedUser(user.username);
+                                    }}
+                                  >
+                                    <LuKey className="size-3.5" />
+                                    <span className="ml-1.5 hidden sm:inline-block">
+                                      {t("users.table.passkey")}
+                                    </span>
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{t("users.managePasskeys")}</p>
+                                </TooltipContent>
+                              </Tooltip>
+
                               {user.username !== "admin" && (
                                 <Tooltip>
                                   <TooltipTrigger asChild>
@@ -351,8 +393,18 @@ export default function AuthenticationView() {
                 </TableBody>
               </Table>
             </div>
-          </div>
-        </div>
+          </TabsContent>
+
+          <TabsContent value="passkeys">
+            {profile && profile.username && profile.username !== "anonymous" ? (
+              <PasskeyManager forUser={profile.username} />
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">
+                {t("users.passkeys.notLoggedIn")}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
 
       <SetPasswordDialog
@@ -378,6 +430,13 @@ export default function AuthenticationView() {
           currentRole={selectedUserRole}
           onSave={(role) => onChangeRole(selectedUser, role)}
           onCancel={() => setShowRoleChange(false)}
+        />
+      )}
+      {selectedUser && (
+        <ManagePasskeysDialog
+          show={showSetPasskey}
+          username={selectedUser}
+          onClose={() => setShowSetPasskey(false)}
         />
       )}
     </div>

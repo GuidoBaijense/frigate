@@ -132,3 +132,5 @@ class User(Model):  # type: ignore[misc]
     )
     password_hash = CharField(null=False, max_length=120)
     notification_tokens = JSONField()
+    webauthn_id = CharField(null=True, max_length=255)
+    webauthn_credentials = JSONField(null=True)
